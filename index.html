@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Zócalo OBS - Jose T</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Fondo transparente - listo para OBS */
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            overflow: hidden;
+        }
+
+        /* Zócalo fijado en la parte inferior central */
+        #zocalo {
+            position: fixed;
+            bottom: 100px;
+            /* 100px desde el borde inferior */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 900px;
+            /* ancho del zócalo */
+            max-width: 98vw;
+            /* no superar el ancho de pantalla */
+            height: 140px;
+        }
+
+        /* Cada imagen ocupa el 100% del contenedor */
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+
+            /* Oculta por defecto */
+            opacity: 0;
+            transform: translateY(14px) scale(0.96);
+            transition:
+                opacity 0.75s ease,
+                transform 0.75s ease;
+
+            pointer-events: none;
+            user-select: none;
+        }
+
+        /* Imagen visible */
+        .slide.activa {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="zocalo">
+        <!-- Imágenes inyectadas por JavaScript -->
+    </div>
+
+    <script>
+        // =====================================================================
+        //  LISTA DE IMÁGENES
+        //  Añadí el nombre exacto del archivo (con extensión) para agregar más.
+        //  Las imágenes deben estar en la MISMA CARPETA que este archivo.
+        // =====================================================================
+        const IMAGENES = [
+            "El profe.png",
+            "Manuel  enciso.png",
+            "abog carlos centurion.png",
+            "amadito.png",
+            "bodega packo.png",
+            "clinica  san  francisco.png",
+            "hector ramos2.png",
+            "hernan martinez.png",
+            "herreria  sandoval.png",
+            "imprecor.png",
+            "julio gamarra.png",
+            "laura acosta.png",
+            "libreria gonza.png",
+            "reybeinitez.png",
+            "ricardo  arroyo.png",
+            "rolo  nuñez.png",
+            "terere el gordo.png",
+            "zonia  boutique.png",
+            // ← Agregá más imágenes aquí
+        ];
+
+        // =====================================================================
+        //  CONFIGURACIÓN
+        // =====================================================================
+        const INTERVALO_MS = 5000;   // Tiempo entre imágenes (milisegundos)
+        const FADE_MS = 375;    // Mitad de la duración del fade (ms)
+
+        // =====================================================================
+        //  LÓGICA — no hace falta modificar nada de acá para abajo
+        // =====================================================================
+        const contenedor = document.getElementById('zocalo');
+        const slides = [];
+        let indiceActual = -1;
+        let orden = [];
+        let posicion = 0;
+
+        // Crear los elementos <img>
+        IMAGENES.forEach(src => {
+            const img = document.createElement('img');
+            img.src = src;
+            img.className = 'slide';
+            img.alt = src.replace(/\.[^.]+$/, '');
+            contenedor.appendChild(img);
+            slides.push(img);
+        });
+
+        // Mezcla aleatoria Fisher-Yates
+        function mezclar(arr) {
+            const a = [...arr];
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+
+        function nuevaRonda() {
+            orden = mezclar([...Array(slides.length).keys()]);
+            posicion = 0;
+        }
+
+        function cambiar(nuevoIndice) {
+            // Fade out de la actual
+            if (indiceActual >= 0) {
+                slides[indiceActual].classList.remove('activa');
+            }
+            // Fade in de la nueva tras el fade out
+            setTimeout(() => {
+                indiceActual = nuevoIndice;
+                slides[indiceActual].classList.add('activa');
+            }, FADE_MS);
+        }
+
+        function mostrarSiguiente() {
+            if (posicion >= orden.length) nuevaRonda();
+            let siguiente = orden[posicion++];
+            // Si salió la misma, tomar la próxima
+            if (siguiente === indiceActual && slides.length > 1) {
+                if (posicion >= orden.length) nuevaRonda();
+                siguiente = orden[posicion++];
+            }
+            cambiar(siguiente);
+        }
+
+        // Arrancar
+        nuevaRonda();
+        mostrarSiguiente();
+        setInterval(mostrarSiguiente, INTERVALO_MS);
+    </script>
+
+</body>
+
+</html>
