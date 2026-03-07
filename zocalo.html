@@ -68,17 +68,31 @@
 
     <script src="imagenes-data.js"></script>
     <script>
-        const zocalo = document.getElementById('zocalo');
+        const contenedor = document.getElementById('zocalo');
         let indiceActual = -1;
         let slides = [];
 
-        // Crear elementos <img> para cada imagen desde ZOCALOS_DATA
-        ZOCALOS_DATA.forEach((src, i) => {
+        // --- Novedad: LECTURA DE LINK PERSONALIZADO ---
+        const params = new URLSearchParams(window.location.search);
+        const zocalosElegidos = params.get('z');
+
+        let zocalosA_Mostrar = ZOCALOS_DATA; // Por defecto mostramos TODOS
+
+        if (zocalosElegidos) {
+            // Si el link tiene la lista explícita, filtramos
+            const indices = zocalosElegidos.split(',').map(n => parseInt(n)).filter(n => !isNaN(n));
+            if (indices.length > 0) {
+                zocalosA_Mostrar = indices.map(idx => ZOCALOS_DATA[idx]).filter(item => item !== undefined);
+            }
+        }
+
+        // Crear elementos <img> para cada imagen desde zocalosA_Mostrar
+        zocalosA_Mostrar.forEach((src, i) => {
             const img = document.createElement('img');
             img.src = src; // nombre con espacios funciona localmente
             img.className = 'slide';
             img.alt = src.replace(/^zocalos\//, '');
-            zocalo.appendChild(img);
+            contenedor.appendChild(img);
             slides.push(img);
         });
 
@@ -92,7 +106,7 @@
             return a;
         }
 
-        let orden = mezclar([...Array(ZOCALOS_DATA.length).keys()]);
+        let orden = mezclar([...Array(zocalosA_Mostrar.length).keys()]);
         let posicion = 0;
 
         function mostrarSiguiente() {
@@ -103,7 +117,7 @@
 
             // Pasar al siguiente del orden aleatorio
             if (posicion >= orden.length) {
-                orden = mezclar([...Array(ZOCALOS_DATA.length).keys()]);
+                orden = mezclar([...Array(zocalosA_Mostrar.length).keys()]);
                 posicion = 0;
             }
 

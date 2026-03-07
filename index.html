@@ -86,8 +86,23 @@
         let orden = [];
         let posicion = 0;
 
-        // Crear los elementos <img> usando los datos de ZOCALOS_DATA
-        ZOCALOS_DATA.forEach(src => {
+        // --- Novedad: LECTURA DE LINK PERSONALIZADO ---
+        // Buscamos si el enlace actual tiene el formato "?z=1,4,5"
+        const params = new URLSearchParams(window.location.search);
+        const zocalosElegidos = params.get('z'); // Obtenemos "1,4,5" o null
+
+        let zocalosA_Mostrar = ZOCALOS_DATA; // Por defecto mostramos TODOS
+
+        if (zocalosElegidos) {
+            // Si el link tiene la lista explícita, filtramos
+            const indices = zocalosElegidos.split(',').map(n => parseInt(n)).filter(n => !isNaN(n));
+            if (indices.length > 0) {
+                zocalosA_Mostrar = indices.map(idx => ZOCALOS_DATA[idx]).filter(item => item !== undefined);
+            }
+        }
+
+        // Crear los elementos <img> usando los datos elegidos
+        zocalosA_Mostrar.forEach(src => {
             const img = document.createElement('img');
             img.src = src;
             img.className = 'slide';

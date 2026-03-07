@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Zócalos - Jose T</title>
+    <style>
+        :root {
+            --primary: #4F46E5;
+            --primary-hover: #4338CA;
+            --bg: #F3F4F6;
+            --text: #1F2937;
+            --card-bg: #FFFFFF;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        p.subtitle {
+            color: #6B7280;
+            font-size: 1.1rem;
+        }
+
+        /* Grilla de selección */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s, border 0.2s;
+            border: 2px solid transparent;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .card.selected {
+            border-color: var(--primary);
+            background-color: #EEF2FF;
+        }
+
+        .card img {
+            max-width: 100%;
+            height: 80px;
+            object-fit: contain;
+            pointer-events: none;
+        }
+
+        .card h3 {
+            font-size: 0.95rem;
+            text-align: center;
+            color: #374151;
+            word-break: break-all;
+            pointer-events: none;
+        }
+
+        /* Checkbox oculto nativo, simulamos visualmente */
+        .card input[type="checkbox"] {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: var(--primary);
+        }
+
+        /* Panel de opciones inferior */
+        .panel-acciones {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            bottom: 2rem;
+        }
+
+        .botones-tipo {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .tipo-btn {
+            flex: 1;
+            padding: 1rem;
+            border: 2px solid #E5E7EB;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: all 0.2s;
+            color: var(--text);
+        }
+
+        .tipo-btn.active {
+            border-color: var(--primary);
+            background: var(--primary);
+            color: white;
+        }
+
+        .resultado-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .resultado-container label {
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border: 1px solid #D1D5DB;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: monospace;
+            background: #F9FAFB;
+            color: #4B5563;
+        }
+
+        button.btn-copiar {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0 1.5rem;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        button.btn-copiar:hover {
+            background: var(--primary-hover);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #10B981;
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-weight: bold;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s;
+            pointer-events: none;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .controls-btn {
+            background: #E5E7EB;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #4B5563;
+        }
+
+        .controls-btn:hover {
+            background: #D1D5DB;
+        }
+
+        @media (max-width: 768px) {
+            .botones-tipo {
+                flex-direction: column;
+            }
+
+            .input-group {
+                flex-direction: column;
+            }
+
+            button.btn-copiar {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>Generador de Transmisiones</h1>
+        <p class="subtitle">Seleccioná los zócalos que querés usar en tu OBS para obtener un enlace personalizado.</p>
+    </header>
+
+    <!-- Base de Datos (JS) -->
+    <script src="imagenes-data.js"></script>
+
+    <div class="controls">
+        <span id="contador" style="font-weight:bold; color:var(--primary); align-self:center;">0 seleccionados</span>
+        <div>
+            <button class="controls-btn" onclick="marcarTodos(true)">Seleccionar Todos</button>
+            <button class="controls-btn" onclick="marcarTodos(false)">Deseleccionar Todos</button>
+        </div>
+    </div>
+
+    <div class="grid" id="grid">
+        <!-- Renderizado dinámico -->
+    </div>
+
+    <div class="panel-acciones">
+        <h2 style="margin-bottom: 1rem; color: #111827;">1. Elegí el tipo de Zócalo</h2>
+        <div class="botones-tipo">
+            <button class="tipo-btn active" id="btn-index" onclick="setTipo('index.html')">Estilo Fade
+                (index.html)</button>
+            <button class="tipo-btn" id="btn-zocalo" onclick="setTipo('zocalo.html')">Estilo Caída
+                (zocalo.html)</button>
+        </div>
+
+        <div class="resultado-container">
+            <label for="link_resultado">2. Copiá este enlace en tu OBS:</label>
+            <div class="input-group">
+                <input type="text" id="link_resultado" readonly placeholder="Seleccioná al menos un zócalo...">
+                <button class="btn-copiar" onclick="copiarLink()">Copiar Enlace</button>
+            </div>
+            <p style="font-size:0.85rem; color:#6B7280; margin-top:0.5rem;">
+                *Si no seleccionás ninguno, el enlace cargará TODOS los zócalos disponibles.
+            </p>
+        </div>
+    </div>
+
+    <div class="toast" id="toast">¡Enlace copiado al portapapeles!</div>
+
+    <script>
+        const grid = document.getElementById('grid');
+        const link_resultado = document.getElementById('link_resultado');
+        const contador = document.getElementById('contador');
+
+        let zocalosActivos = new Set();
+        let tipoArchivo = 'index.html'; // Default
+
+        // 1. Dibujar grilla
+        ZOCALOS_DATA.forEach((src, index) => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.onclick = () => toggleSeleccion(index, card);
+
+            const nombre = src.replace(/^zocalos\//, '');
+
+            card.innerHTML = `
+                <input type="checkbox" id="chk_${index}" value="${index}">
+                <img src="${src}" alt="${nombre}">
+                <h3>${nombre}</h3>
+            `;
+
+            grid.appendChild(card);
+        });
+
+        // 2. Lógica UI
+        function toggleSeleccion(index, cardElement) {
+            const checkbox = document.getElementById(`chk_${index}`);
+
+            if (zocalosActivos.has(index)) {
+                zocalosActivos.delete(index);
+                cardElement.classList.remove('selected');
+                checkbox.checked = false;
+            } else {
+                zocalosActivos.add(index);
+                cardElement.classList.add('selected');
+                checkbox.checked = true;
+            }
+            actualizarEnlace();
+        }
+
+        function marcarTodos(estado) {
+            const cards = document.querySelectorAll('.card');
+            cards.forEach((card, index) => {
+                const checkbox = document.getElementById(`chk_${index}`);
+                checkbox.checked = estado;
+
+                if (estado) {
+                    zocalosActivos.add(index);
+                    card.classList.add('selected');
+                } else {
+                    zocalosActivos.delete(index);
+                    card.classList.remove('selected');
+                }
+            });
+            actualizarEnlace();
+        }
+
+        function setTipo(archivo) {
+            tipoArchivo = archivo;
+            document.getElementById('btn-index').classList.remove('active');
+            document.getElementById('btn-zocalo').classList.remove('active');
+
+            if (archivo === 'index.html') {
+                document.getElementById('btn-index').classList.add('active');
+            } else {
+                document.getElementById('btn-zocalo').classList.add('active');
+            }
+            actualizarEnlace();
+        }
+
+        function actualizarEnlace() {
+            contador.innerText = `${zocalosActivos.size} seleccionados`;
+
+            // Conseguir la URL base actual sin index.html ni parámetros
+            let baseUrl = window.location.href.split('generador.html')[0];
+
+            if (zocalosActivos.size === 0 || zocalosActivos.size === ZOCALOS_DATA.length) {
+                // Si están todos (o ninguno), no hace falta enviar parámetros (Carga Todo).
+                link_resultado.value = baseUrl + tipoArchivo;
+            } else {
+                // Armar string: "0,3,5"
+                const queryStr = Array.from(zocalosActivos).sort((a, b) => a - b).join(',');
+                link_resultado.value = `${baseUrl}${tipoArchivo}?z=${queryStr}`;
+            }
+        }
+
+        function copiarLink() {
+            if (!link_resultado.value) return;
+
+            navigator.clipboard.writeText(link_resultado.value).then(() => {
+                const toast = document.getElementById('toast');
+                toast.classList.add('show');
+                setTimeout(() => toast.classList.remove('show'), 3000);
+            });
+        }
+
+        // Inicializar enlace en vacío (Carga Todo)
+        actualizarEnlace();
+
+    </script>
+</body>
+
+</html>
