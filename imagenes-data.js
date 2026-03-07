@@ -21,5 +21,6 @@ const ZOCALOS_DATA = [
     "zocalos/rolo  nuñez.png",
     "zocalos/terere el gordo.png",
     "zocalos/zonia  boutique.png"
+    "zocalos/gringos.png"
     // ← Agregar acá el nombre de nuevas imágenes respetando el formato anterior
 ];
