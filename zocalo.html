@@ -92,7 +92,7 @@
             return a;
         }
 
-        let orden = mezclar([...Array(imagenes.length).keys()]);
+        let orden = mezclar([...Array(ZOCALOS_DATA.length).keys()]);
         let posicion = 0;
 
         function mostrarSiguiente() {
@@ -103,7 +103,7 @@
 
             // Pasar al siguiente del orden aleatorio
             if (posicion >= orden.length) {
-                orden = mezclar([...Array(imagenes.length).keys()]);
+                orden = mezclar([...Array(ZOCALOS_DATA.length).keys()]);
                 posicion = 0;
             }
 
