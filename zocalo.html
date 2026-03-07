@@ -66,40 +66,18 @@
         <!-- Las imágenes se inyectan dinámicamente -->
     </div>
 
+    <script src="imagenes-data.js"></script>
     <script>
-        // Lista de imágenes (todos los archivos PNG de la carpeta)
-        const imagenes = [
-            "El profe.png",
-            "Manuel  enciso.png",
-            "abog carlos centurion.png",
-            "amadito.png",
-            "bodega packo.png",
-            "clinica  san  francisco.png",
-            "hector ramos2.png",
-            "hernan martinez.png",
-            "herreria  sandoval.png",
-            "imprecor.png",
-            "julio gamarra.png",
-            "laura acosta.png",
-            "libreria gonza.png",
-            "reybeinitez.png",
-            "ricardo  arroyo.png",
-            "rolo  nuñez.png",
-            "terere el gordo.png",
-            "zonia  boutique.png"
-        ];
-
         const zocalo = document.getElementById('zocalo');
         let indiceActual = -1;
         let slides = [];
 
-        // Crear elementos <img> para cada imagen
-        imagenes.forEach((src, i) => {
+        // Crear elementos <img> para cada imagen desde ZOCALOS_DATA
+        ZOCALOS_DATA.forEach((src, i) => {
             const img = document.createElement('img');
-            img.src = encodeURIComponent(src).replace(/%20/g, '%20').replace(/%20%20/g, '%20%20');
             img.src = src; // nombre con espacios funciona localmente
             img.className = 'slide';
-            img.alt = src;
+            img.alt = src.replace(/^zocalos\//, '');
             zocalo.appendChild(img);
             slides.push(img);
         });

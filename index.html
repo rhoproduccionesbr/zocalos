@@ -69,34 +69,8 @@
         <!-- Imágenes inyectadas por JavaScript -->
     </div>
 
+    <script src="imagenes-data.js"></script>
     <script>
-        // =====================================================================
-        //  LISTA DE IMÁGENES
-        //  Añadí el nombre exacto del archivo (con extensión) para agregar más.
-        //  Las imágenes deben estar en la MISMA CARPETA que este archivo.
-        // =====================================================================
-        const IMAGENES = [
-            "El profe.png",
-            "Manuel  enciso.png",
-            "abog carlos centurion.png",
-            "amadito.png",
-            "bodega packo.png",
-            "clinica  san  francisco.png",
-            "hector ramos2.png",
-            "hernan martinez.png",
-            "herreria  sandoval.png",
-            "imprecor.png",
-            "julio gamarra.png",
-            "laura acosta.png",
-            "libreria gonza.png",
-            "reybeinitez.png",
-            "ricardo  arroyo.png",
-            "rolo  nuñez.png",
-            "terere el gordo.png",
-            "zonia  boutique.png",
-            // ← Agregá más imágenes aquí
-        ];
-
         // =====================================================================
         //  CONFIGURACIÓN
         // =====================================================================
@@ -112,12 +86,12 @@
         let orden = [];
         let posicion = 0;
 
-        // Crear los elementos <img>
-        IMAGENES.forEach(src => {
+        // Crear los elementos <img> usando los datos de ZOCALOS_DATA
+        ZOCALOS_DATA.forEach(src => {
             const img = document.createElement('img');
             img.src = src;
             img.className = 'slide';
-            img.alt = src.replace(/\.[^.]+$/, '');
+            img.alt = src.replace(/^zocalos\//, '').replace(/\.[^.]+$/, '');
             contenedor.appendChild(img);
             slides.push(img);
         });
